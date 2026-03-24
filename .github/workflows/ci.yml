@@ -75,7 +75,7 @@ jobs:
           cd .. && rm -rf _sparse
       - name: Run smoke test
         run: |
-          docker run --rm -v ${{ github.workspace }}/dapps_tx:/app/dapps_tx smartoracle --dapp 20211221_visor_finance
+          docker run --rm -v ${{ github.workspace }}/dapps_tx:/app/dapps_tx smartoracle --dapp 20211221_visor_finance | tee output.txt
       - name: Validate output
         run: |
           grep -q "end mining" output.txt || (echo "FAIL: mining did not complete" && exit 1)
