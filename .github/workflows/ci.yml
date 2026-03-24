@@ -9,17 +9,16 @@ on:
     - cron: '0 6 * * 1'
 
 jobs:
-
   l1-build:
     name: L1 - Docker build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       - name: Build Docker image
         run: docker build -t smartoracle .
       - name: Save image as artifact
         run: docker save smartoracle | gzip > smartoracle.tar.gz
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4.6.0
         with:
           name: smartoracle-image
           path: smartoracle.tar.gz
@@ -30,7 +29,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: l1-build
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@fa0a91b85d4f404e444306234b4e3b8927a7a2dc # v4.1.8
         with:
           name: smartoracle-image
       - name: Load Docker image
@@ -51,14 +50,14 @@ jobs:
     runs-on: ubuntu-latest
     needs: l1-build
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/download-artifact@fa0a91b85d4f404e444306234b4e3b8927a7a2dc # v4.1.8
         with:
           name: smartoracle-image
       - name: Load Docker image
         run: docker load < smartoracle.tar.gz
       - name: Cache demo trace data
-        uses: actions/cache@v4
+        uses: actions/cache@1bd1e32a3bdc45362d1e726936510720a7c6158d # v4.2.0
         id: cache-dapps-tx
         with:
           path: dapps_tx
@@ -87,8 +86,8 @@ jobs:
     name: L4 - Lint Dockerfile
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: hadolint/hadolint-action@v3.1.0
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: hadolint/hadolint-action@54c9adbab1582c2ef04b2016b760714a4bfde3cf # v3.1.0
         with:
           dockerfile: Dockerfile
-          failure-threshold: warning
+          failure-threshold: error
