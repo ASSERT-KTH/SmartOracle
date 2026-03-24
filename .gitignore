@@ -1,0 +1,9 @@
+dapps_tx/
+SmartOracle/venv/
+SmartOracle/invs/
+SmartOracle/__pycache__/
+**/__pycache__/
+*.pyc
+*.tar.gz
+*.tar.zst
+invs/

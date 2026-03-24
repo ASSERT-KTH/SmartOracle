@@ -1,0 +1,94 @@
+name: SmartOracle CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: '0 6 * * 1'
+
+jobs:
+
+  l1-build:
+    name: L1 - Docker build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build Docker image
+        run: docker build -t smartoracle .
+      - name: Save image as artifact
+        run: docker save smartoracle | gzip > smartoracle.tar.gz
+      - uses: actions/upload-artifact@v4
+        with:
+          name: smartoracle-image
+          path: smartoracle.tar.gz
+          retention-days: 1
+
+  l2-deps:
+    name: L2 - Dependency binary checks
+    runs-on: ubuntu-latest
+    needs: l1-build
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: smartoracle-image
+      - name: Load Docker image
+        run: docker load < smartoracle.tar.gz
+      - name: Check key Python packages
+        run: |
+          docker run --rm --entrypoint python smartoracle -c "
+          import web3; print('web3 OK')
+          import statsmodels; print('statsmodels OK')
+          import numpy; print('numpy OK')
+          import sklearn; print('sklearn OK')
+          "
+      - name: Check Go binary
+        run: docker run --rm --entrypoint /usr/local/bin/hunter smartoracle --help
+
+  l3-smoke:
+    name: L3 - Smoke test
+    runs-on: ubuntu-latest
+    needs: l1-build
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: smartoracle-image
+      - name: Load Docker image
+        run: docker load < smartoracle.tar.gz
+      - name: Cache demo trace data
+        uses: actions/cache@v4
+        id: cache-dapps-tx
+        with:
+          path: dapps_tx
+          key: dapps-tx-visor-finance-v1
+      - name: Download demo trace data
+        if: steps.cache-dapps-tx.outputs.cache-hit != 'true'
+        run: |
+          git clone --no-checkout --depth 1 https://github.com/Demonhero0/SmartOracle.git _sparse
+          cd _sparse
+          git sparse-checkout init --cone
+          git sparse-checkout set dapps_tx/20211221_visor_finance
+          git checkout main
+          mkdir -p ../dapps_tx
+          cp -r dapps_tx/20211221_visor_finance ../dapps_tx/
+          cd .. && rm -rf _sparse
+      - name: Run smoke test
+        run: |
+          docker run --rm -v ${{ github.workspace }}/dapps_tx:/app/dapps_tx smartoracle --dapp 20211221_visor_finance | tee output.txt
+      - name: Validate output
+        run: |
+          grep -q "end mining" output.txt || (echo "FAIL: mining did not complete" && exit 1)
+          grep -q "Checked Txs" output.txt || (echo "FAIL: checking did not complete" && exit 1)
+          echo "Smoke test passed"
+
+  l4-lint:
+    name: L4 - Lint Dockerfile
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: Dockerfile
+          failure-threshold: warning
