@@ -33,6 +33,7 @@ RUN python3.8 -m venv /app/venv \
 COPY dapps/ /app/dapps/
 
 WORKDIR /app/SmartOracle
+RUN mkdir -p /app/SmartOracle/invs
 ENV PATH="/app/venv/bin:$PATH"
 
 ENTRYPOINT ["python", "main.py"]
