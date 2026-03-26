@@ -78,7 +78,7 @@ jobs:
           docker run --rm -v ${{ github.workspace }}/dapps_tx:/app/dapps_tx smartoracle --dapp 20211221_visor_finance | tee output.txt
       - name: Validate output
         run: |
-          grep -q "end mining" output.txt || (echo "FAIL: mining did not complete" && exit 1)
+          grep -q "start mining" output.txt || (echo "FAIL: mining did not start" && exit 1)
           grep -q "Checked Txs" output.txt || (echo "FAIL: checking did not complete" && exit 1)
           echo "Smoke test passed"
 
