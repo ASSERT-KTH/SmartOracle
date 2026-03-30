@@ -45,8 +45,8 @@ func replayInvAction(ctx *cli.Context) error {
 	outputPath = ctx.Args().Get(2)
 	substatePath := ctx.Args().Get(3)
 
-	first := 8000000
-	last := 15000000
+	first := 0
+	last := 2000000
 	// filePath := "hunter/trash/blockTxList.json"
 
 	file, err := os.Open(filePath)
