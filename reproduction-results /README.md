@@ -4,7 +4,7 @@ This repository contains the mapping and comparative analysis between your datas
 
 ## ✅ EXACT MATCHES (Identical Address)
 
-| Your Dataset | SmartOracle DApp Folder | Contract | Address |
+| Dfhl Dataset | SmartOracle DApp Folder | Contract | Address |
 | :--- | :--- | :--- | :--- |
 | 202008_Opyn | 20200804_opyn | oToken | 0x951d51...ABfe2 |
 | 202102_Yearn_ydai | 20210205_yearn_finance | yVault | 0xACd43E...F952 |
@@ -15,7 +15,7 @@ This repository contains the mapping and comparative analysis between your datas
 
 ## ⚠️ Same Protocol, Different Incident
 
-| Your Dataset | SmartOracle Folder | Notes |
+| Dfhl Dataset | SmartOracle Folder | Notes |
 | :--- | :--- | :--- |
 | 202206_InverseFinance <br>*(Jun 2022, YVCrv3CryptoFeed, oracle/flash loan)* | 20220402_inverse_finance <br>*(Apr 2022, CErc20Immutable)* | Same DApp, but different hacks — different addresses and contracts. |
 
